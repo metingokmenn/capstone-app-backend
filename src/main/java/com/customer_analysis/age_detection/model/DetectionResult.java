@@ -1,5 +1,7 @@
 package com.customer_analysis.age_detection.model;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,12 +28,21 @@ public class DetectionResult {
     @Column(name = "confidence_score")
     private Double confidenceScore;
 
+    @CreationTimestamp
     @Column(name = "timestamp")
     private String timestamp;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id")
     private Image image;
+
+    public DetectionResult(){}
+
+    public DetectionResult(Integer detectedAge, Double confidenceScore, Image image){
+        this.detectedAge = detectedAge;
+        this.confidenceScore = confidenceScore;
+        this.image = image;
+    }
 
     public Integer getResultId(){
         return this.resultId;

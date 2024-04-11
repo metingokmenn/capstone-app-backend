@@ -72,4 +72,24 @@ public class AgeDetectionService {
     public DetectionResult findResultByImage(Image image){
         return resultRepository.findByImage(image);
     }
+
+    public void postImage(byte[] imageData, Integer id){
+        Visit visit = findVisitById(id);
+        imageRepository.save(new Image(imageData,visit));
+    }
+
+    public void addStore(String storeName, String location){
+        storeRepositroy.save(new Store(storeName,location));
+    }
+
+    public void addVisit(String ageGroup, String gender, Integer id){
+        Store store = findStoreById(id);
+        visitRepository.save(new Visit(ageGroup,gender,store));
+    }
+
+    public void addResult(Integer detectedAge, Double confidenceScore, Integer id){
+        Image image = findImageById(id);
+        resultRepository.save(new DetectionResult(detectedAge,confidenceScore,image));
+        
+    }
 }

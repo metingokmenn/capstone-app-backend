@@ -1,6 +1,7 @@
 package com.customer_analysis.age_detection.model;
 
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 
 import jakarta.persistence.CascadeType;
@@ -27,6 +28,7 @@ public class Image {
     @Column(name = "image_data")
     private byte[] imageData; 
 
+    @CreationTimestamp
     @Column(name = "timestamp")
     private String timestamp;
 
@@ -37,7 +39,18 @@ public class Image {
     @OneToOne(mappedBy = "image")
     private DetectionResult result;
 
-    public Integer getId(){
+    public Image(){}
+
+    public Image(byte[] imageData){
+        this.imageData = imageData;
+    }
+
+    public Image(byte[] imageData,Visit visit){
+        this.imageData = imageData;
+        this.visit = visit;
+    }
+
+    public Integer getImageId(){
         return this.imageId;
     }
 

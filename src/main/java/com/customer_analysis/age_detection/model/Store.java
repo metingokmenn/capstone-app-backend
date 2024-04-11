@@ -39,7 +39,7 @@ public class Store {
         this.location = location;
     }
 
-    public Integer getId(){
+    public Integer getStoreId(){
         return this.id;
     }
 

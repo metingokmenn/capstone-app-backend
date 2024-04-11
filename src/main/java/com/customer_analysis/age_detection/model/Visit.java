@@ -1,5 +1,7 @@
 package com.customer_analysis.age_detection.model;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,6 +22,7 @@ public class Visit {
     @Column(name = "visit_id")
     private Integer id;
 
+    @CreationTimestamp
     @Column(name = "timestamp")
     private String timestamp;
 
@@ -38,12 +41,13 @@ public class Visit {
 
     public Visit(){}
 
-    public Visit(String ageGroup,String gender){
+    public Visit(String ageGroup,String gender,Store store){
         this.ageGroup = ageGroup;
         this.gender = gender;
+        this.store = store;
     }
 
-    public Integer getId(){
+    public Integer getVisitId(){
         return this.id;
     }
 
