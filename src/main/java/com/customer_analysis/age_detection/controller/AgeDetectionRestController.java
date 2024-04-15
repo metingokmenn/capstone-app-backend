@@ -121,7 +121,7 @@ public class AgeDetectionRestController {
     @DeleteMapping("/delete/{type}/{id}")
     public ResponseEntity<String> delete(@PathVariable String type, @PathVariable Integer id){
 
-        if(service.remove(type.toUpperCase(), id)){
+        if(service.remove(type.toLowerCase(), id)){
             return ResponseEntity.ok("Record removed.");
         }
         else{

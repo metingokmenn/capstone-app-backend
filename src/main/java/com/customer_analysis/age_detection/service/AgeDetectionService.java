@@ -114,16 +114,16 @@ public class AgeDetectionService {
 
     public boolean remove(String type, Integer id){
         switch (type) {
-            case "STORE":
+            case "store":
                 storeRepositroy.deleteById(id);
                 return true;    
-            case "IMAGE":
+            case "image":
                 imageRepository.deleteById(id);
                 return true;
-            case "VISIT":
+            case "visit":
                 visitRepository.deleteById(id);
                 return true;
-            case "RESULT":
+            case "result":
                 resultRepository.deleteById(id);
                 return true;
             default:
