@@ -15,6 +15,8 @@ import com.customer_analysis.age_detection.model.Image;
 import com.customer_analysis.age_detection.model.Store;
 import com.customer_analysis.age_detection.model.Visit;
 import com.customer_analysis.age_detection.service.AgeDetectionService;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -116,5 +118,15 @@ public class AgeDetectionRestController {
         return ResponseEntity.ok("Result posted.");
     }
 
-    
+    @DeleteMapping("/delete/{type}/{id}")
+    public ResponseEntity<String> delete(@PathVariable String type, @PathVariable Integer id){
+
+        if(service.remove(type.toUpperCase(), id)){
+            return ResponseEntity.ok("Record removed.");
+        }
+        else{
+            return ResponseEntity.ok("Given type is not available.");
+        }
+        
+    }
 }

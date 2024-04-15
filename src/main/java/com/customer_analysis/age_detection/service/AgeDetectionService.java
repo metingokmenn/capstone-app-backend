@@ -92,4 +92,23 @@ public class AgeDetectionService {
         resultRepository.save(new DetectionResult(detectedAge,confidenceScore,image));
         
     }
+
+    public boolean remove(String type, Integer id){
+        switch (type) {
+            case "STORE":
+                storeRepositroy.deleteById(id);
+                return true;    
+            case "IMAGE":
+                imageRepository.deleteById(id);
+                return true;
+            case "VISIT":
+                visitRepository.deleteById(id);
+                return true;
+            case "RESULT":
+                resultRepository.deleteById(id);
+                return true;
+            default:
+                return false;
+        }
+    }
 }
