@@ -2,7 +2,6 @@ package com.customer_analysis.age_detection.model;
 
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -11,7 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -60,6 +58,18 @@ public class Image {
 
     public String getTimestamp(){
         return this.timestamp;
+    }
+
+    public void setImageData(byte[] imageData){
+        this.imageData = imageData;
+    }
+
+    public void setVisit(Visit visit){
+        this.visit = visit;
+    }
+
+    public void setResult(DetectionResult result){
+        this.result = result;
     }
 
 }

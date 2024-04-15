@@ -64,6 +64,18 @@ public class Visit {
         return this.gender;
     }
 
+    public void setAgeGroup(String ageGroup){
+        this.ageGroup = ageGroup;
+    }
+
+    public void setGender(String gender){
+        this.gender = gender;
+    }
+
+    public void setStore(Store store){
+        this.store = store;
+    }
+
     /*
     public Store getStore(){
         return this.store;

@@ -60,5 +60,17 @@ public class DetectionResult {
         return this.timestamp;
     }
 
+    public void setDetectedAge(Integer detectedAge){
+        this.detectedAge = detectedAge;
+    }
+
+    public void setConfidenceScore(Double confidenceScore){
+        this.confidenceScore = confidenceScore;
+    }
+
+    public void setImage(Image image){
+        this.image = image;
+    }
+
 
 }

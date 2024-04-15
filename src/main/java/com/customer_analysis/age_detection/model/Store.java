@@ -55,6 +55,14 @@ public class Store {
         return this.listVisit;
     }*/
 
+    public void setStoreName(String storeName){
+        this.storeName = storeName;
+    }
+
+    public void setLocation(String location){
+        this.location = location;
+    }
+
     
 
 
