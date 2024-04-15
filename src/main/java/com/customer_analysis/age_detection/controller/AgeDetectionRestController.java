@@ -4,7 +4,6 @@ import java.util.Base64;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +17,7 @@ import com.customer_analysis.age_detection.service.AgeDetectionService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -127,6 +127,31 @@ public class AgeDetectionRestController {
         else{
             return ResponseEntity.ok("Given type is not available.");
         }
-        
     }
+
+    @PatchMapping("/update_store")
+    public ResponseEntity<String> updateStore(@RequestParam("id") Integer id, @RequestParam("store_name") String storeName, @RequestParam("location") String location){
+
+        service.updateStore(id, storeName, location);
+
+        return ResponseEntity.ok("Store is updated.");
+    }
+
+    @PatchMapping("/update_store_name")
+    public ResponseEntity<String> updateStoreStoreName(@RequestParam("id") Integer id, @RequestParam("store_name") String storeName){
+
+        service.updateStoreStoreName(id, storeName);
+
+        return ResponseEntity.ok("Store name is updated.");
+    }
+
+    @PatchMapping("/update_store_location")
+    public ResponseEntity<String> updateStoreLocation(@RequestParam("id") Integer id, @RequestParam("location") String location){
+
+        service.updateStoreLocation(id, location);
+
+        return ResponseEntity.ok("Store location is updated.");
+    }
+
+
 }

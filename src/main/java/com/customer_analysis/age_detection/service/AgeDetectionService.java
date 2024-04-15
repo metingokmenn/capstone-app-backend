@@ -92,6 +92,25 @@ public class AgeDetectionService {
         resultRepository.save(new DetectionResult(detectedAge,confidenceScore,image));
         
     }
+    
+    public void updateStore(Integer id,String storeName,String location){
+        Store updatedStore = storeRepositroy.getReferenceById(id);
+
+        updatedStore.setStoreName(storeName);
+        updatedStore.setLocation(location);
+    }
+
+    public void updateStoreStoreName(Integer id,String storeName){
+        Store updatedStore = storeRepositroy.getReferenceById(id);
+
+        updatedStore.setStoreName(storeName);
+    }
+
+    public void updateStoreLocation(Integer id,String location){
+        Store updatedStore = storeRepositroy.getReferenceById(id);
+
+        updatedStore.setLocation(location);
+    }
 
     public boolean remove(String type, Integer id){
         switch (type) {
