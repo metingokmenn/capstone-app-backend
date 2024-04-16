@@ -154,7 +154,7 @@ public class AgeDetectionRestController {
     }
 
     @PatchMapping("/update_visit")
-    public ResponseEntity<String> updateVisit(@RequestParam("id") Integer id, @RequestParam("age_group") String ageGroup, @RequestParam("gender") String gender, @RequestParam("store") Integer storeId){
+    public ResponseEntity<String> updateVisit(@RequestParam("id") Integer id, @RequestParam("age_group") String ageGroup, @RequestParam("gender") String gender, @RequestParam("store_id") Integer storeId){
 
         Store store = service.findStoreById(storeId);
 
@@ -205,7 +205,6 @@ public class AgeDetectionRestController {
         return ResponseEntity.ok("Image data is updated.");
 
     }
-
     @PatchMapping("/update_image_visit")
     public ResponseEntity<String> updateImageVisit(@RequestParam("id") Integer id, @RequestParam("visit_id") Integer visitId){
 
@@ -215,7 +214,38 @@ public class AgeDetectionRestController {
         service.updateImageVisit(id, visit);
 
         return ResponseEntity.ok("Image visit is updated.");
+    }
 
+    @PatchMapping("/update_result")
+    public ResponseEntity<String> updateResult(@RequestParam("id") Integer id, @RequestParam("detected_age") Integer detectedAge, @RequestParam("confidence_score") Double confidenceScore, 
+    @RequestParam("image_id") Integer imageId){
+
+        Image image = service.findImageById(imageId);
+
+        service.updateResult(id, detectedAge, confidenceScore, image);
+
+
+        return ResponseEntity.ok("Result is updated");
+    }
+
+    @PatchMapping("/update_result_details")
+    public ResponseEntity<String> updateResultDetails(@RequestParam("id") Integer id, @RequestParam("detected_age") Integer detectedAge, @RequestParam("confidence_score") Double confidenceScore){
+
+        service.updateResultDetails(id, detectedAge, confidenceScore);
+
+
+        return ResponseEntity.ok("Result details are updated");
+    }
+
+    @PatchMapping("/update_result_image")
+    public ResponseEntity<String> updateResultImage(@RequestParam("id") Integer id, @RequestParam("image_id") Integer imageId){
+
+        Image image = service.findImageById(imageId);
+
+        service.updateResultImage(id,image);
+
+
+        return ResponseEntity.ok("Result image is updated");
     }
 
 

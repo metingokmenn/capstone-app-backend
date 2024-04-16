@@ -152,6 +152,27 @@ public class AgeDetectionService {
         updatedImage.setVisit(visit);
     }
 
+    public void updateResult(Integer id, Integer detectedAge, Double confidenceScore, Image image){
+        DetectionResult updatedResult = resultRepository.getReferenceById(id);
+
+        updatedResult.setDetectedAge(detectedAge);
+        updatedResult.setConfidenceScore(confidenceScore);
+        updatedResult.setImage(image);
+    }
+
+    public void updateResultDetails(Integer id, Integer detectedAge, Double confidenceScore){
+        DetectionResult updatedResult = resultRepository.getReferenceById(id);
+
+        updatedResult.setDetectedAge(detectedAge);
+        updatedResult.setConfidenceScore(confidenceScore);
+    }
+
+    public void updateResultImage(Integer id, Image image){
+        DetectionResult updatedResult = resultRepository.getReferenceById(id);
+
+        updatedResult.setImage(image);
+    }
+
     public boolean remove(String type, Integer id){
         switch (type) {
             case "store":
