@@ -153,5 +153,33 @@ public class AgeDetectionRestController {
         return ResponseEntity.ok("Store location is updated.");
     }
 
+    @PatchMapping("/update_visit")
+    public ResponseEntity<String> updateVisit(@RequestParam("id") Integer id, @RequestParam("age_group") String ageGroup, @RequestParam("gender") String gender, @RequestParam("store") Integer storeId){
+
+        Store store = service.findStoreById(storeId);
+
+        service.updateVisit(id, ageGroup, gender, store);
+
+        return ResponseEntity.ok("Visit is updated.");
+    }
+
+    @PatchMapping("/update_visit_details")
+    public ResponseEntity<String> updateVisit(@RequestParam("id") Integer id, @RequestParam("age_group") String ageGroup, @RequestParam("gender") String gender){
+
+        service.updateVisitDetails(id, ageGroup, gender);
+
+        return ResponseEntity.ok("Visit is updated.");
+    }
+
+    @PatchMapping("/update_visit_store")
+    public ResponseEntity<String> updateVisit(@RequestParam("id") Integer id, @RequestParam("store") Integer storeId){
+
+        Store store = service.findStoreById(storeId);
+
+        service.updateVisitStore(id,store);
+
+        return ResponseEntity.ok("Visit is updated.");
+    }
+
 
 }

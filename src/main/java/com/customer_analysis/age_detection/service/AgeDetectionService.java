@@ -112,6 +112,27 @@ public class AgeDetectionService {
         updatedStore.setLocation(location);
     }
 
+    public void updateVisit(Integer id, String ageGroup, String gender, Store store){
+        Visit updatedVisit = visitRepository.getReferenceById(id);
+        
+        updatedVisit.setAgeGroup(ageGroup);
+        updatedVisit.setGender(gender);
+        updatedVisit.setStore(store);
+    }
+
+    public void updateVisitDetails(Integer id, String ageGroup, String gender){
+        Visit updatedVisit = visitRepository.getReferenceById(id);
+
+        updatedVisit.setAgeGroup(ageGroup);
+        updatedVisit.setGender(gender);
+    }
+
+    public void updateVisitStore(Integer id, Store store){
+        Visit updatedVisit = visitRepository.getReferenceById(id);
+
+        updatedVisit.setStore(store);
+    }
+
     public boolean remove(String type, Integer id){
         switch (type) {
             case "store":
