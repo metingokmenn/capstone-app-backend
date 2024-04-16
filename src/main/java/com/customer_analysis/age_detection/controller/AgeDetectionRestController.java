@@ -164,21 +164,58 @@ public class AgeDetectionRestController {
     }
 
     @PatchMapping("/update_visit_details")
-    public ResponseEntity<String> updateVisit(@RequestParam("id") Integer id, @RequestParam("age_group") String ageGroup, @RequestParam("gender") String gender){
+    public ResponseEntity<String> updateVisitDetails(@RequestParam("id") Integer id, @RequestParam("age_group") String ageGroup, @RequestParam("gender") String gender){
 
         service.updateVisitDetails(id, ageGroup, gender);
 
-        return ResponseEntity.ok("Visit is updated.");
+        return ResponseEntity.ok("Visit details are updated.");
     }
 
     @PatchMapping("/update_visit_store")
-    public ResponseEntity<String> updateVisit(@RequestParam("id") Integer id, @RequestParam("store") Integer storeId){
+    public ResponseEntity<String> updateVisitStore(@RequestParam("id") Integer id, @RequestParam("store") Integer storeId){
 
         Store store = service.findStoreById(storeId);
 
         service.updateVisitStore(id,store);
 
-        return ResponseEntity.ok("Visit is updated.");
+        return ResponseEntity.ok("Visit store is updated.");
+    }
+
+    @PatchMapping("/update_image")
+    public ResponseEntity<String> updateImage(@RequestParam("id") Integer id, @RequestParam("image_data") String imageData, @RequestParam("visit_id") Integer visitId){
+
+        Visit visit = service.findVisitById(visitId);
+
+        byte[] decodedData = Base64.getDecoder().decode(imageData);
+
+        service.updateImage(id, decodedData, visit);
+
+        return ResponseEntity.ok("Image is updated.");
+
+    }
+
+    @PatchMapping("/update_image_data")
+    public ResponseEntity<String> updateImageData(@RequestParam("id") Integer id, @RequestParam("image_data") String imageData){
+
+
+        byte[] decodedData = Base64.getDecoder().decode(imageData);
+        
+        service.updateImageData(id, decodedData);
+
+        return ResponseEntity.ok("Image data is updated.");
+
+    }
+
+    @PatchMapping("/update_image_visit")
+    public ResponseEntity<String> updateImageVisit(@RequestParam("id") Integer id, @RequestParam("visit_id") Integer visitId){
+
+        Visit visit = service.findVisitById(visitId);
+
+        
+        service.updateImageVisit(id, visit);
+
+        return ResponseEntity.ok("Image visit is updated.");
+
     }
 
 

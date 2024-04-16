@@ -68,8 +68,5 @@ public class Image {
         this.visit = visit;
     }
 
-    public void setResult(DetectionResult result){
-        this.result = result;
-    }
 
 }

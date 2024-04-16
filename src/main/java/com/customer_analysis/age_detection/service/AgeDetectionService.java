@@ -133,6 +133,25 @@ public class AgeDetectionService {
         updatedVisit.setStore(store);
     }
 
+    public void updateImage(Integer id, byte[] imageData, Visit visit){
+        Image updatedImage = imageRepository.getReferenceById(id);
+
+        updatedImage.setImageData(imageData);
+        updatedImage.setVisit(visit);
+    }
+
+    public void updateImageData(Integer id, byte[] imageData){
+        Image updatedImage = imageRepository.getReferenceById(id);
+
+        updatedImage.setImageData(imageData);
+    }
+
+    public void updateImageVisit(Integer id, Visit visit){
+        Image updatedImage = imageRepository.getReferenceById(id);
+
+        updatedImage.setVisit(visit);
+    }
+
     public boolean remove(String type, Integer id){
         switch (type) {
             case "store":
