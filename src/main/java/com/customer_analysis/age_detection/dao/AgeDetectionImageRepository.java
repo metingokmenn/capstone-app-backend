@@ -4,8 +4,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.customer_analysis.age_detection.model.Image;
 import com.customer_analysis.age_detection.model.Visit;
+import java.util.List;
+
 
 public interface AgeDetectionImageRepository extends JpaRepository<Image,Integer> {
     
     public Image findByVisit(Visit visit); 
+
+    List<Image> findByImageData(byte[] imageData);
 }

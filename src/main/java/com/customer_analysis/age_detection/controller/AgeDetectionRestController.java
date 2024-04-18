@@ -87,7 +87,7 @@ public class AgeDetectionRestController {
     }
 
     @PostMapping("/post_image")
-    public ResponseEntity<String> postImage(@RequestParam("data") String imageData, @RequestParam("id") Integer id){
+    public ResponseEntity<String> postImage(@RequestParam("data") String imageData, @RequestParam("visit_id") Integer id){
         byte[] decodedData = Base64.getDecoder().decode(imageData);
         
         service.postImage(decodedData,id);
@@ -103,7 +103,7 @@ public class AgeDetectionRestController {
     }
 
     @PostMapping("/add_visit")
-    public ResponseEntity<String> addVisit(@RequestParam("age_group") String ageGroup, @RequestParam("gender") String gender, @RequestParam("id") Integer id){
+    public ResponseEntity<String> addVisit(@RequestParam("age_group") String ageGroup, @RequestParam("gender") String gender, @RequestParam("store_id") Integer id){
         
         service.addVisit(ageGroup, gender, id);
 
@@ -111,7 +111,7 @@ public class AgeDetectionRestController {
     }
 
     @PostMapping("/add_result")
-    public ResponseEntity<String> addResult(@RequestParam("detected_age") Integer age, @RequestParam("confidence_score") Double confidenceScore, @RequestParam("id") Integer id){
+    public ResponseEntity<String> addResult(@RequestParam("detected_age") Integer age, @RequestParam("confidence_score") Double confidenceScore, @RequestParam("image_id") Integer id){
 
         service.addResult(age, confidenceScore, id);
 
@@ -246,6 +246,14 @@ public class AgeDetectionRestController {
 
 
         return ResponseEntity.ok("Result image is updated");
+    }
+
+    @GetMapping("/search/{key}")
+    public ResponseEntity<List<Object>> searchEntity(@PathVariable() String key){
+
+        List<Object> result = service.search(key);
+
+        return ResponseEntity.ok(result);
     }
 
 

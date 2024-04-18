@@ -1,6 +1,8 @@
 package com.customer_analysis.age_detection.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -190,5 +192,27 @@ public class AgeDetectionService {
             default:
                 return false;
         }
+    }
+
+    public List<Object> search(String key){
+        List<Object> resultList = new ArrayList<Object>();
+        
+        try {
+            Integer idKey = Integer.parseInt(key);
+            Optional<Visit> searchedVisit = visitRepository.findById(idKey);
+            Optional<Image> searchedImage = imageRepository.findById(idKey);
+            Optional<Store> searchedStore = storeRepositroy.findById(idKey);
+            Optional<DetectionResult> searchedResult = resultRepository.findById(idKey);
+            if(searchedVisit.isPresent()) resultList.add(searchedVisit);
+            if(searchedImage.isPresent()) resultList.add(searchedImage);
+            if(searchedStore.isPresent()) resultList.add(searchedStore);
+            if(searchedResult.isPresent()) resultList.add(searchedResult);
+            
+        } catch (NumberFormatException e) {
+            
+        }
+
+        return resultList;
+        
     }
 }
