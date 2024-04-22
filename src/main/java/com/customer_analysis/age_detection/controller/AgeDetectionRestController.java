@@ -15,6 +15,7 @@ import com.customer_analysis.age_detection.model.Store;
 import com.customer_analysis.age_detection.model.Visit;
 import com.customer_analysis.age_detection.service.AgeDetectionService;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -71,6 +72,7 @@ public class AgeDetectionRestController {
     }
 
     @GetMapping("/results")
+    @CrossOrigin
     public ResponseEntity<List<DetectionResult>> getResults(){
         List<DetectionResult> results = service.findAllResults();
 
