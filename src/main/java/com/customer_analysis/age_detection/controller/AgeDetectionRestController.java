@@ -1,9 +1,13 @@
 package com.customer_analysis.age_detection.controller;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -73,11 +77,24 @@ public class AgeDetectionRestController {
 
     @GetMapping("/results")
     @CrossOrigin
-    public ResponseEntity<List<DetectionResult>> getResults(){
-        List<DetectionResult> results = service.findAllResults();
+    public ResponseEntity<List<DetectionResult>> getResults(@RequestParam("start_date") Optional<String> startDateString,
+    @RequestParam("end_date") Optional<String> endDateString){
+        List<DetectionResult> results;
+
+        
+        if(startDateString.isPresent() && endDateString.isPresent()){
+            LocalDateTime startDate = LocalDateTime.parse(startDateString.get());
+            LocalDateTime endDate = LocalDateTime.parse(endDateString.get());
+            results = service.findResultByDate(startDate, endDate);
+        }
+        else{
+            results = service.findAllResults();
+        }
 
         return ResponseEntity.ok(results);
     }
+
+    
 
     @GetMapping("/findResultByImage/{id}")
     public ResponseEntity<DetectionResult> getResultByImage(@PathVariable Integer id){

@@ -1,5 +1,6 @@
 package com.customer_analysis.age_detection.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -69,6 +70,10 @@ public class AgeDetectionService {
 
     public List<DetectionResult> findAllResults(){
         return resultRepository.findAll();
+    }
+
+    public List<DetectionResult> findResultByDate(LocalDateTime startDate, LocalDateTime endDate){
+        return resultRepository.findByTimestampBetween(startDate, endDate);
     }
 
     public DetectionResult findResultByImage(Image image){

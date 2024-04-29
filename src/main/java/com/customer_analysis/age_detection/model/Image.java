@@ -1,6 +1,8 @@
 package com.customer_analysis.age_detection.model;
 
 
+import java.time.LocalDateTime;
+
 import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.CascadeType;
@@ -11,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
@@ -26,9 +29,9 @@ public class Image {
     @Column(name = "image_data")
     private byte[] imageData; 
 
-    @CreationTimestamp
+    
     @Column(name = "timestamp")
-    private String timestamp;
+    private LocalDateTime timestamp;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "visit_id")
@@ -36,6 +39,11 @@ public class Image {
 
     @OneToOne(mappedBy = "image")
     private DetectionResult result;
+
+    @PrePersist
+    public void prePersist(){
+        this.timestamp = LocalDateTime.now();
+    }
 
     public Image(){}
 
@@ -56,7 +64,7 @@ public class Image {
         return this.imageData;
     }
 
-    public String getTimestamp(){
+    public LocalDateTime getTimestamp(){
         return this.timestamp;
     }
 
