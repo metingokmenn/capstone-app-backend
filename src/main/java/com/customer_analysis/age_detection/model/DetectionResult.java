@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,16 +18,17 @@ import jakarta.persistence.Table;
 @Table(name="Age_Detection_Result")
 public class DetectionResult {
 
-    
-    
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "result_id")
     private Integer resultId;
 
-    @Column(name = "detected_age")
-    private Integer detectedAge;
+    @Column(name = "age_group")
+    private String ageGroup;
+
+    @Column(name = "gender")
+    private String gender;
 
     @Column(name = "confidence_score")
     private Double confidenceScore;
@@ -34,9 +36,9 @@ public class DetectionResult {
     @Column(name = "timestamp")
     private LocalDateTime timestamp;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "image_id")
-    private Image image;
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @JoinColumn(name = "visit_id")
+    private Visit visit;
 
     @PrePersist
     public void prePersist(){
@@ -45,18 +47,31 @@ public class DetectionResult {
 
     public DetectionResult(){}
 
-    public DetectionResult(Integer detectedAge, Double confidenceScore, Image image){
-        this.detectedAge = detectedAge;
+    public DetectionResult(String ageGroup, String gender, Double confidenceScore, Visit visit){
         this.confidenceScore = confidenceScore;
-        this.image = image;
+        this.visit = visit;
+        this.gender = gender;
+        this.ageGroup = ageGroup;
     }
 
     public Integer getResultId(){
         return this.resultId;
     }
 
-    public Integer getDetectedAge(){
-        return this.detectedAge;
+    public String getAgeGroup() {
+        return ageGroup;
+    }
+
+    public void setAgeGroup(String ageGroup) {
+        this.ageGroup = ageGroup;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public Double getConfidenceScore(){
@@ -67,16 +82,15 @@ public class DetectionResult {
         return this.timestamp;
     }
 
-    public void setDetectedAge(Integer detectedAge){
-        this.detectedAge = detectedAge;
-    }
 
     public void setConfidenceScore(Double confidenceScore){
         this.confidenceScore = confidenceScore;
     }
 
-    public void setImage(Image image){
-        this.image = image;
+    
+
+    public void setVisit(Visit visit) {
+        this.visit = visit;
     }
 
 }

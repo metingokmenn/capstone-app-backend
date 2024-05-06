@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,19 +28,13 @@ public class Visit {
     
     @Column(name = "timestamp")
     private LocalDateTime timestamp;
-
-    @Column(name = "age_group")
-    private String ageGroup;
-
-    @Column(name = "gender")
-    private String gender;
     
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "store_id")
     private Store store;
 
-    @OneToOne(mappedBy = "visit")
-    private Image image;
+    @OneToOne(mappedBy = "visit",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private DetectionResult result;
 
     @PrePersist
     public void prePersist(){
@@ -48,9 +43,8 @@ public class Visit {
 
     public Visit(){}
 
-    public Visit(String ageGroup,String gender,Store store){
-        this.ageGroup = ageGroup;
-        this.gender = gender;
+    public Visit(Store store){
+        
         this.store = store;
     }
 
@@ -63,30 +57,12 @@ public class Visit {
         return this.timestamp;
     }
 
-    public String getAgeGroup(){
-        return this.ageGroup;
-    }
-
-    public String getGender(){
-        return this.gender;
-    }
-
-    public void setAgeGroup(String ageGroup){
-        this.ageGroup = ageGroup;
-    }
-
-    public void setGender(String gender){
-        this.gender = gender;
-    }
-
     public void setStore(Store store){
         this.store = store;
     }
 
-    /*
-    public Store getStore(){
-        return this.store;
-    }*/
+    
+    
 
     @Override
     public String toString() {

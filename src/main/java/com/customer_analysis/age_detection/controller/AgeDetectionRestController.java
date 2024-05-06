@@ -1,10 +1,12 @@
 package com.customer_analysis.age_detection.controller;
 
 import java.time.LocalDateTime;
-import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.customer_analysis.age_detection.model.DetectionResult;
-import com.customer_analysis.age_detection.model.Image;
 import com.customer_analysis.age_detection.model.Store;
 import com.customer_analysis.age_detection.model.Visit;
 import com.customer_analysis.age_detection.service.AgeDetectionService;
@@ -58,19 +59,19 @@ public class AgeDetectionRestController {
         return ResponseEntity.ok(visits);
     }
 
-    @GetMapping("/images")
-    public ResponseEntity<List<Image>> getImages(){
-        List<Image> images = service.findAllImages();
-        return ResponseEntity.ok(images);
-    }
+    @GetMapping("/findResultByVisit/{id}")
+    public ResponseEntity<DetectionResult> getResultByVisit(@PathVariable Integer id){
 
-    @GetMapping("/findImageByVisit/{id}")
-    public ResponseEntity<Image> getImageByVisit(@PathVariable Integer id){
         Visit visit = service.findVisitById(id);
 
-        Image image = service.findImageByVisit(visit);
+        Hibernate.initialize(visit);
 
-        return ResponseEntity.ok(image);
+        DetectionResult result = service.findResultByVisit(visit);
+
+        Hibernate.initialize(result);
+
+        return ResponseEntity.ok(result);
+
     }
 
     @GetMapping("/results")
@@ -92,25 +93,45 @@ public class AgeDetectionRestController {
         return ResponseEntity.ok(results);
     }
 
-    
-
-    @GetMapping("/findResultByImage/{id}")
-    public ResponseEntity<DetectionResult> getResultByImage(@PathVariable Integer id){
-        Image image = service.findImageById(id);
-
-        DetectionResult result = service.findResultByImage(image);
-
-        return ResponseEntity.ok(result);
-    }
-
-    @PostMapping("/post_image")
-    public ResponseEntity<String> postImage(@RequestParam("data") String imageData, @RequestParam("visit_id") Integer id){
-        byte[] decodedData = Base64.getDecoder().decode(imageData);
+    @GetMapping("/results/gender")
+    @CrossOrigin
+    public ResponseEntity<Map<String,Integer>> getGenderCount(@RequestParam("start_date") Optional<String> startDateString, @RequestParam("end_date") Optional<String> endDateString){
+        Map<String, Integer> genderCountsMap;
         
-        service.postImage(decodedData,id);
+        if(startDateString.isPresent() && endDateString.isPresent()){
+            LocalDateTime startDate = LocalDateTime.parse(startDateString.get());
+            LocalDateTime endDate = LocalDateTime.parse(endDateString.get());
+            genderCountsMap = service.getGenderCountByDate(startDate, endDate);
+        }
 
-        return ResponseEntity.ok("Image posted.");
+        else{
+            genderCountsMap = service.getGenderCounts();
+        }
+
+
+        return ResponseEntity.ok(genderCountsMap);
     }
+
+    @GetMapping("/results/age")
+    @CrossOrigin
+    public ResponseEntity<Map<String,Integer>> getAgeCount(@RequestParam("start_date") Optional<String> startDateString, @RequestParam("end_date") Optional<String> endDateString){
+        Map<String,Integer> ageCounts;
+
+        if(startDateString.isPresent() && endDateString.isPresent()){
+            LocalDateTime startDate = LocalDateTime.parse(startDateString.get());
+            LocalDateTime endDate = LocalDateTime.parse(endDateString.get());
+            ageCounts = service.getAgeCountsByDate(startDate,endDate);
+        }
+
+        else{
+            ageCounts = service.getAgeCounts();
+        }
+        
+        
+
+        return ResponseEntity.ok(ageCounts);
+    }
+
 
     @PostMapping("/add_store")
     public ResponseEntity<String> addStore(@RequestParam("store_name") String storeName, @RequestParam("location") String location){
@@ -120,17 +141,17 @@ public class AgeDetectionRestController {
     }
 
     @PostMapping("/add_visit")
-    public ResponseEntity<String> addVisit(@RequestParam("age_group") String ageGroup, @RequestParam("gender") String gender, @RequestParam("store_id") Integer id){
+    public ResponseEntity<String> addVisit(@RequestParam("store_id") Integer id){
         
-        service.addVisit(ageGroup, gender, id);
+        service.addVisit(id);
 
         return ResponseEntity.ok("Visit posted.");
     }
 
     @PostMapping("/add_result")
-    public ResponseEntity<String> addResult(@RequestParam("detected_age") Integer age, @RequestParam("confidence_score") Double confidenceScore, @RequestParam("image_id") Integer id){
+    public ResponseEntity<String> addResult(@RequestParam("age_group") String ageGroup, @RequestParam("gender") String gender , @RequestParam("confidence_score") Double confidenceScore, @RequestParam("visit_id") Integer id){
 
-        service.addResult(age, confidenceScore, id);
+        service.addResult(gender, ageGroup, confidenceScore, id);
 
         return ResponseEntity.ok("Result posted.");
     }
@@ -171,99 +192,47 @@ public class AgeDetectionRestController {
     }
 
     @PatchMapping("/update_visit")
-    public ResponseEntity<String> updateVisit(@RequestParam("id") Integer id, @RequestParam("age_group") String ageGroup, @RequestParam("gender") String gender, @RequestParam("store_id") Integer storeId){
+    public ResponseEntity<String> updateVisit(@RequestParam("id") Integer id, @RequestParam("store_id") Integer storeId){
 
         Store store = service.findStoreById(storeId);
 
-        service.updateVisit(id, ageGroup, gender, store);
+        service.updateVisit(id,store);
 
         return ResponseEntity.ok("Visit is updated.");
     }
 
-    @PatchMapping("/update_visit_details")
-    public ResponseEntity<String> updateVisitDetails(@RequestParam("id") Integer id, @RequestParam("age_group") String ageGroup, @RequestParam("gender") String gender){
 
-        service.updateVisitDetails(id, ageGroup, gender);
-
-        return ResponseEntity.ok("Visit details are updated.");
-    }
-
-    @PatchMapping("/update_visit_store")
-    public ResponseEntity<String> updateVisitStore(@RequestParam("id") Integer id, @RequestParam("store") Integer storeId){
-
-        Store store = service.findStoreById(storeId);
-
-        service.updateVisitStore(id,store);
-
-        return ResponseEntity.ok("Visit store is updated.");
-    }
-
-    @PatchMapping("/update_image")
-    public ResponseEntity<String> updateImage(@RequestParam("id") Integer id, @RequestParam("image_data") String imageData, @RequestParam("visit_id") Integer visitId){
-
-        Visit visit = service.findVisitById(visitId);
-
-        byte[] decodedData = Base64.getDecoder().decode(imageData);
-
-        service.updateImage(id, decodedData, visit);
-
-        return ResponseEntity.ok("Image is updated.");
-
-    }
-
-    @PatchMapping("/update_image_data")
-    public ResponseEntity<String> updateImageData(@RequestParam("id") Integer id, @RequestParam("image_data") String imageData){
-
-
-        byte[] decodedData = Base64.getDecoder().decode(imageData);
-        
-        service.updateImageData(id, decodedData);
-
-        return ResponseEntity.ok("Image data is updated.");
-
-    }
-    @PatchMapping("/update_image_visit")
-    public ResponseEntity<String> updateImageVisit(@RequestParam("id") Integer id, @RequestParam("visit_id") Integer visitId){
-
-        Visit visit = service.findVisitById(visitId);
-
-        
-        service.updateImageVisit(id, visit);
-
-        return ResponseEntity.ok("Image visit is updated.");
-    }
 
     @PatchMapping("/update_result")
-    public ResponseEntity<String> updateResult(@RequestParam("id") Integer id, @RequestParam("detected_age") Integer detectedAge, @RequestParam("confidence_score") Double confidenceScore, 
-    @RequestParam("image_id") Integer imageId){
+    public ResponseEntity<String> updateResult(@RequestParam("id") Integer id, @RequestParam("gender") String gender , @RequestParam("age_group") String ageGroup, @RequestParam("visit_id") Integer visitId, @RequestParam("confidence_score") Double confidenceScore){
 
-        Image image = service.findImageById(imageId);
+        Visit visit = service.findVisitById(visitId);
 
-        service.updateResult(id, detectedAge, confidenceScore, image);
+        service.updateResult(id, gender, ageGroup, visit, confidenceScore);
 
 
         return ResponseEntity.ok("Result is updated");
     }
 
     @PatchMapping("/update_result_details")
-    public ResponseEntity<String> updateResultDetails(@RequestParam("id") Integer id, @RequestParam("detected_age") Integer detectedAge, @RequestParam("confidence_score") Double confidenceScore){
+    public ResponseEntity<String> updateResultDetails(@RequestParam("id") Integer id, @RequestParam("gender") String gender,@RequestParam("age_group") String ageGroup , @RequestParam("confidence_score") Double confidenceScore){
 
-        service.updateResultDetails(id, detectedAge, confidenceScore);
+        service.updateResultDetails(id, gender, ageGroup, confidenceScore);
 
 
         return ResponseEntity.ok("Result details are updated");
     }
 
-    @PatchMapping("/update_result_image")
-    public ResponseEntity<String> updateResultImage(@RequestParam("id") Integer id, @RequestParam("image_id") Integer imageId){
+    @PatchMapping("update_result_visit")
+    public ResponseEntity<String> updateResultVisit(@RequestParam("id") Integer id, @RequestParam("visit_id") Integer visitId){
+        Visit visit = service.findVisitById(visitId);
 
-        Image image = service.findImageById(imageId);
+        service.updateResultVisit(id, visit);
 
-        service.updateResultImage(id,image);
-
-
-        return ResponseEntity.ok("Result image is updated");
+        return ResponseEntity.ok("Result visit is updated.");
     }
+
+    
 
     @GetMapping("/search/{key}")
     public ResponseEntity<List<Object>> searchEntity(@PathVariable() String key){

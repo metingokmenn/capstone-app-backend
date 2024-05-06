@@ -2,19 +2,21 @@ package com.customer_analysis.age_detection.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.customer_analysis.age_detection.dao.AgeDetectionImageRepository;
+
 import com.customer_analysis.age_detection.dao.AgeDetectionResultRepository;
 import com.customer_analysis.age_detection.dao.AgeDetectionStoreRepositroy;
 import com.customer_analysis.age_detection.dao.AgeDetectionVisitRepository;
 import com.customer_analysis.age_detection.model.DetectionResult;
-import com.customer_analysis.age_detection.model.Image;
+
 import com.customer_analysis.age_detection.model.Store;
 import com.customer_analysis.age_detection.model.Visit;
 
@@ -29,8 +31,6 @@ public class AgeDetectionService {
     @Autowired
     private AgeDetectionVisitRepository visitRepository;
 
-    @Autowired
-    private AgeDetectionImageRepository imageRepository;
 
     @Autowired
     private AgeDetectionResultRepository resultRepository;
@@ -55,50 +55,109 @@ public class AgeDetectionService {
     public Visit findVisitById(Integer id){
         return visitRepository.getReferenceById(id);
     }
-
-    public Image findImageByVisit(Visit visit){
-        return imageRepository.findByVisit(visit);
-    }
-
-    public List<Image> findAllImages(){
-        return imageRepository.findAll();
-    }
-
-    public Image findImageById(Integer id){
-        return imageRepository.getReferenceById(id);
-    }
+   
 
     public List<DetectionResult> findAllResults(){
         return resultRepository.findAll();
+    }
+
+    public Map<String,Integer> getAgeCounts(){
+        List<String> ageCounts = resultRepository.countAge();
+        Map<String,Integer> ageGroupCounts = new HashMap<String,Integer>();
+        // Iterate over each data entry
+        for (String entry : ageCounts) {
+            // Split each entry into age group and count parts
+            String[] parts = entry.split(",");
+            String ageGroup = parts[0];
+            int count = Integer.parseInt(parts[1]);
+
+            // Add age group and count to the map
+            ageGroupCounts.put(ageGroup, count);
+        }
+
+        return ageGroupCounts;
+    }
+
+    public Map<String,Integer> getAgeCountsByDate(LocalDateTime startDate, LocalDateTime endDate){
+        List<String> ageCounts = resultRepository.countAgeByDate(startDate, endDate);
+        Map<String,Integer> ageCountsMap = new HashMap<String,Integer>();
+
+        for (String entry : ageCounts) {
+            // Split each entry into age group and count parts
+            String[] parts = entry.split(",");
+            String ageGroup = parts[0];
+            int count = Integer.parseInt(parts[1]);
+
+            // Add age group and count to the map
+            ageCountsMap.put(ageGroup, count);
+        }
+
+        return ageCountsMap;
+    }
+
+    public Map<String,Integer> getGenderCounts(){
+        
+
+        List<String> genderCounts = resultRepository.countGender();
+        Map<String,Integer> genderCountsMap = new HashMap<String,Integer>();
+
+        for (String genderCount : genderCounts) {
+            // Split the string by comma to separate gender and count
+            String[] parts = genderCount.split(",");
+            if (parts.length == 2) {
+                String gender = parts[0].trim();
+                int count = Integer.parseInt(parts[1].trim());
+                // Add gender and count to the map
+                genderCountsMap.put(gender, count);
+            }
+        }
+
+        return genderCountsMap;
+    
+    }
+
+    public Map<String,Integer> getGenderCountByDate(LocalDateTime startDate, LocalDateTime endDate){
+        List<String> genderCounts = resultRepository.countGenderByDate(startDate, endDate);
+        Map<String,Integer> genderCountsMap = new HashMap<String,Integer>();
+
+        for (String genderCount : genderCounts) {
+            // Split the string by comma to separate gender and count
+            String[] parts = genderCount.split(",");
+            if (parts.length == 2) {
+                String gender = parts[0].trim();
+                int count = Integer.parseInt(parts[1].trim());
+                // Add gender and count to the map
+                genderCountsMap.put(gender, count);
+            }
+        }
+
+        return genderCountsMap;
     }
 
     public List<DetectionResult> findResultByDate(LocalDateTime startDate, LocalDateTime endDate){
         return resultRepository.findByTimestampBetween(startDate, endDate);
     }
 
-    public DetectionResult findResultByImage(Image image){
-        return resultRepository.findByImage(image);
+    public DetectionResult findResultByVisit(Visit visit){
+        return resultRepository.findByVisit(visit);
     }
 
-    public void postImage(byte[] imageData, Integer id){
-        Visit visit = findVisitById(id);
-        imageRepository.save(new Image(imageData,visit));
-    }
 
     public void addStore(String storeName, String location){
         storeRepositroy.save(new Store(storeName,location));
     }
 
-    public void addVisit(String ageGroup, String gender, Integer id){
+    public void addVisit(Integer id){
         Store store = findStoreById(id);
-        visitRepository.save(new Visit(ageGroup,gender,store));
+        visitRepository.save(new Visit(store));
     }
 
-    public void addResult(Integer detectedAge, Double confidenceScore, Integer id){
-        Image image = findImageById(id);
-        resultRepository.save(new DetectionResult(detectedAge,confidenceScore,image));
-        
+    
+    public void addResult(String gender, String ageGroup, Double confidenceScore, Integer id){
+        Visit visit = findVisitById(id);
+        resultRepository.save(new DetectionResult(ageGroup, gender, confidenceScore,visit));
     }
+    
     
     public void updateStore(Integer id,String storeName,String location){
         Store updatedStore = storeRepositroy.getReferenceById(id);
@@ -119,75 +178,43 @@ public class AgeDetectionService {
         updatedStore.setLocation(location);
     }
 
-    public void updateVisit(Integer id, String ageGroup, String gender, Store store){
+    public void updateVisit(Integer id,Store store){
         Visit updatedVisit = visitRepository.getReferenceById(id);
         
-        updatedVisit.setAgeGroup(ageGroup);
-        updatedVisit.setGender(gender);
         updatedVisit.setStore(store);
     }
 
-    public void updateVisitDetails(Integer id, String ageGroup, String gender){
-        Visit updatedVisit = visitRepository.getReferenceById(id);
-
-        updatedVisit.setAgeGroup(ageGroup);
-        updatedVisit.setGender(gender);
-    }
-
-    public void updateVisitStore(Integer id, Store store){
-        Visit updatedVisit = visitRepository.getReferenceById(id);
-
-        updatedVisit.setStore(store);
-    }
-
-    public void updateImage(Integer id, byte[] imageData, Visit visit){
-        Image updatedImage = imageRepository.getReferenceById(id);
-
-        updatedImage.setImageData(imageData);
-        updatedImage.setVisit(visit);
-    }
-
-    public void updateImageData(Integer id, byte[] imageData){
-        Image updatedImage = imageRepository.getReferenceById(id);
-
-        updatedImage.setImageData(imageData);
-    }
-
-    public void updateImageVisit(Integer id, Visit visit){
-        Image updatedImage = imageRepository.getReferenceById(id);
-
-        updatedImage.setVisit(visit);
-    }
-
-    public void updateResult(Integer id, Integer detectedAge, Double confidenceScore, Image image){
+    
+    public void updateResult(Integer id, String gender, String ageGroup, Visit visit, Double confidenceScore){
         DetectionResult updatedResult = resultRepository.getReferenceById(id);
 
-        updatedResult.setDetectedAge(detectedAge);
+        updatedResult.setAgeGroup(ageGroup);
+        updatedResult.setGender(gender);
+        updatedResult.setVisit(visit);
         updatedResult.setConfidenceScore(confidenceScore);
-        updatedResult.setImage(image);
     }
+    
 
-    public void updateResultDetails(Integer id, Integer detectedAge, Double confidenceScore){
+    public void updateResultDetails(Integer id, String gender, String ageGroup, Double confidenceScore){
         DetectionResult updatedResult = resultRepository.getReferenceById(id);
 
-        updatedResult.setDetectedAge(detectedAge);
+        updatedResult.setAgeGroup(ageGroup);
+        updatedResult.setGender(gender);
         updatedResult.setConfidenceScore(confidenceScore);
     }
 
-    public void updateResultImage(Integer id, Image image){
+    public void updateResultVisit(Integer id, Visit visit){
         DetectionResult updatedResult = resultRepository.getReferenceById(id);
 
-        updatedResult.setImage(image);
+        updatedResult.setVisit(visit);
     }
+
 
     public boolean remove(String type, Integer id){
         switch (type) {
             case "store":
                 storeRepositroy.deleteById(id);
                 return true;    
-            case "image":
-                imageRepository.deleteById(id);
-                return true;
             case "visit":
                 visitRepository.deleteById(id);
                 return true;
@@ -205,11 +232,9 @@ public class AgeDetectionService {
         try {
             Integer idKey = Integer.parseInt(key);
             Optional<Visit> searchedVisit = visitRepository.findById(idKey);
-            Optional<Image> searchedImage = imageRepository.findById(idKey);
             Optional<Store> searchedStore = storeRepositroy.findById(idKey);
             Optional<DetectionResult> searchedResult = resultRepository.findById(idKey);
             if(searchedVisit.isPresent()) resultList.add(searchedVisit);
-            if(searchedImage.isPresent()) resultList.add(searchedImage);
             if(searchedStore.isPresent()) resultList.add(searchedStore);
             if(searchedResult.isPresent()) resultList.add(searchedResult);
             
