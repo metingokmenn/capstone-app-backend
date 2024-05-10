@@ -9,7 +9,7 @@ import com.customer_analysis.age_detection.model.Visit;
 import java.time.LocalDateTime;
 
 import java.util.List;
-import java.util.Map;
+
 
 
 public interface AgeDetectionResultRepository extends JpaRepository<DetectionResult,Integer> {
@@ -34,6 +34,8 @@ public interface AgeDetectionResultRepository extends JpaRepository<DetectionRes
 
     @Query("SELECT d.ageGroup, COUNT(d.ageGroup) FROM DetectionResult d WHERE d.timestamp BETWEEN :start_date AND :end_date GROUP BY d.ageGroup")
     public List<String> countAgeByDate(@Param("start_date") LocalDateTime startDate, @Param("end_date") LocalDateTime endDate);
+
+    public boolean existsByVisitId(Integer visitId);
 
 
 

@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
@@ -20,7 +21,8 @@ public class DetectionResult {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "result_id_seq", sequenceName = "age_detection_result_result_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "result_id_seq")
     @Column(name = "result_id")
     private Integer resultId;
 
@@ -36,7 +38,7 @@ public class DetectionResult {
     @Column(name = "timestamp")
     private LocalDateTime timestamp;
 
-    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "visit_id")
     private Visit visit;
 

@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import java.lang.IllegalStateException;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -155,7 +158,13 @@ public class AgeDetectionService {
     
     public void addResult(String gender, String ageGroup, Double confidenceScore, Integer id){
         Visit visit = findVisitById(id);
-        resultRepository.save(new DetectionResult(ageGroup, gender, confidenceScore,visit));
+        if(resultRepository.existsByVisitId(id)){
+            throw new IllegalStateException("This visit is already related with a result.");
+        }
+        else{
+            resultRepository.save(new DetectionResult(ageGroup, gender, confidenceScore,visit));
+        }
+        
     }
     
     

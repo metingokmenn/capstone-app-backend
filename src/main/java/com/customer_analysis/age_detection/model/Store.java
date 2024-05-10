@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
@@ -18,7 +19,8 @@ import jakarta.persistence.Table;
 public class Store {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "store_id_seq", sequenceName = "store_store_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "store_id_seq")
     @Column(name = "store_id")
     private Integer id;
 
@@ -28,7 +30,7 @@ public class Store {
     @Column(name = "location")
     private String location;
 
-    @OneToMany(mappedBy = "store", fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "store",cascade = CascadeType.ALL)
     private List<Visit> listVisit = new ArrayList<>();
 
 

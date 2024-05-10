@@ -149,6 +149,7 @@ public class AgeDetectionRestController {
     }
 
     @PostMapping("/add_result")
+    @CrossOrigin
     public ResponseEntity<String> addResult(@RequestParam("age_group") String ageGroup, @RequestParam("gender") String gender , @RequestParam("confidence_score") Double confidenceScore, @RequestParam("visit_id") Integer id){
 
         service.addResult(gender, ageGroup, confidenceScore, id);

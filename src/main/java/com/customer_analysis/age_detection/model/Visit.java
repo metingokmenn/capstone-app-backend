@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
@@ -21,7 +22,8 @@ import jakarta.persistence.Table;
 public class Visit {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "visit_id_seq", sequenceName = "visit_data_visit_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "visit_id_seq")
     @Column(name = "visit_id")
     private Integer id;
 
@@ -33,7 +35,7 @@ public class Visit {
     @JoinColumn(name = "store_id")
     private Store store;
 
-    @OneToOne(mappedBy = "visit",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "visit",cascade = CascadeType.ALL)
     private DetectionResult result;
 
     @PrePersist
