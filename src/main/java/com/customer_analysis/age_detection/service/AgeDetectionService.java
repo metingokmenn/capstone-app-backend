@@ -55,6 +55,21 @@ public class AgeDetectionService {
         return visitRepository.findByStore(store);
     }
 
+    public List<DetectionResult> findResultByStore(Integer id){
+        Store store = findStoreById(id);
+
+        List<Visit> visits = findVisitsOfStore(store);
+        List<DetectionResult> results = new ArrayList<>();
+        
+
+        for (int i = 0; i < visits.size(); i++) {
+            results.add(resultRepository.findByVisitId(visits.get(i).getVisitId()));
+        }
+
+        return results;
+
+    }
+
     public Visit findVisitById(Integer id){
         return visitRepository.getReferenceById(id);
     }
@@ -138,7 +153,7 @@ public class AgeDetectionService {
     }
 
     public List<DetectionResult> findResultByDate(LocalDateTime startDate, LocalDateTime endDate){
-        return resultRepository.findByTimestampBetween(startDate, endDate);
+        return resultRepository.findByTimestampBetweenOrderByTimestamp(startDate, endDate);
     }
 
     public DetectionResult findResultByVisit(Visit visit){

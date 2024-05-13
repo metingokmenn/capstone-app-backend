@@ -10,4 +10,5 @@ import com.customer_analysis.age_detection.model.Visit;
 public interface AgeDetectionVisitRepository extends JpaRepository<Visit,Integer> {
     
     public List<Visit> findByStore(Store store);
+    
 }

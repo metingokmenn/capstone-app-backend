@@ -21,8 +21,9 @@ public interface AgeDetectionResultRepository extends JpaRepository<DetectionRes
 
     public List<DetectionResult> findByConfidenceScore(Double confidenceScore);
 
-    public List<DetectionResult> findByTimestampBetween(LocalDateTime startDate, LocalDateTime endDate);
+    public List<DetectionResult> findByTimestampBetweenOrderByTimestamp(LocalDateTime startDate, LocalDateTime endDate);
 
+    
     @Query("SELECT gender, COUNT(gender) FROM DetectionResult GROUP BY gender")
     public List<String> countGender();
 
@@ -35,8 +36,16 @@ public interface AgeDetectionResultRepository extends JpaRepository<DetectionRes
     @Query("SELECT d.ageGroup, COUNT(d.ageGroup) FROM DetectionResult d WHERE d.timestamp BETWEEN :start_date AND :end_date GROUP BY d.ageGroup")
     public List<String> countAgeByDate(@Param("start_date") LocalDateTime startDate, @Param("end_date") LocalDateTime endDate);
 
+
+
+
     public boolean existsByVisitId(Integer visitId);
 
+
+    public DetectionResult findByVisitId(Integer visitId);
+
+
+    
 
 
 

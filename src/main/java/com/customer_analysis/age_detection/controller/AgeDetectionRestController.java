@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
 @RequestMapping("/rest")
+@CrossOrigin
 public class AgeDetectionRestController {
 
     @Autowired
@@ -73,8 +74,17 @@ public class AgeDetectionRestController {
 
     }
 
+    @GetMapping("/findResultByStore/{id}")
+    public ResponseEntity<List<DetectionResult>> getResultByStore(@PathVariable Integer id){
+
+
+        List<DetectionResult> results = service.findResultByStore(id);
+
+        return ResponseEntity.ok(results);
+
+    }
+
     @GetMapping("/results")
-    @CrossOrigin
     public ResponseEntity<List<DetectionResult>> getResults(@RequestParam("start_date") Optional<String> startDateString,
     @RequestParam("end_date") Optional<String> endDateString){
         List<DetectionResult> results;
@@ -93,7 +103,7 @@ public class AgeDetectionRestController {
     }
 
     @GetMapping("/results/gender")
-    @CrossOrigin
+    
     public ResponseEntity<Map<String,Integer>> getGenderCount(@RequestParam("start_date") Optional<String> startDateString, @RequestParam("end_date") Optional<String> endDateString){
         Map<String, Integer> genderCountsMap;
         
@@ -112,7 +122,7 @@ public class AgeDetectionRestController {
     }
 
     @GetMapping("/results/age")
-    @CrossOrigin
+    
     public ResponseEntity<Map<String,Integer>> getAgeCount(@RequestParam("start_date") Optional<String> startDateString, @RequestParam("end_date") Optional<String> endDateString){
         Map<String,Integer> ageCounts;
 
@@ -148,7 +158,7 @@ public class AgeDetectionRestController {
     }
 
     @PostMapping("/add_result")
-    @CrossOrigin
+    
     public ResponseEntity<String> addResult(@RequestParam("age_group") String ageGroup, @RequestParam("gender") String gender , @RequestParam("confidence_score") Double confidenceScore, @RequestParam("visit_id") Integer id){
 
         service.addResult(gender, ageGroup, confidenceScore, id);
