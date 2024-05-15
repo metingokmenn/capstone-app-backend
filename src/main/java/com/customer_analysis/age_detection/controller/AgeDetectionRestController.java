@@ -75,10 +75,21 @@ public class AgeDetectionRestController {
     }
 
     @GetMapping("/findResultByStore/{id}")
-    public ResponseEntity<List<DetectionResult>> getResultByStore(@PathVariable Integer id){
+    public ResponseEntity<List<DetectionResult>> getResultByStore(@PathVariable Integer id, @RequestParam("start_date") Optional<String> startDateString, @RequestParam("end_date") Optional<String> endDateString){
 
+        List<DetectionResult> results;
 
-        List<DetectionResult> results = service.findResultByStore(id);
+        if(startDateString.isPresent() && endDateString.isPresent()){
+            LocalDateTime startDate = LocalDateTime.parse(startDateString.get());
+            LocalDateTime endDate = LocalDateTime.parse(endDateString.get());
+
+            results = service.findResultByStoreByDate(startDate, endDate, id);
+        }
+        else{
+            results = service.findResultByStore(id);
+        }
+
+        
 
         return ResponseEntity.ok(results);
 

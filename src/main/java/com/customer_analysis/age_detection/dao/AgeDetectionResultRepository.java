@@ -44,10 +44,13 @@ public interface AgeDetectionResultRepository extends JpaRepository<DetectionRes
 
     public DetectionResult findByVisitId(Integer visitId);
 
-
     
 
 
-
+    
+    
+    @Query("SELECT d FROM DetectionResult d JOIN d.visit v WHERE v.id = :visitId AND d.timestamp BETWEEN :start_date AND :end_date")
+    public DetectionResult findByVisitIdBetweenTimestamp(@Param("visitId") Integer visitId, @Param("start_date") LocalDateTime startDate, @Param("end_date") LocalDateTime endDate);
+    
     
 }

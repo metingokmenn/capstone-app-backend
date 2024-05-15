@@ -59,7 +59,7 @@ public class AgeDetectionService {
         Store store = findStoreById(id);
 
         List<Visit> visits = findVisitsOfStore(store);
-        List<DetectionResult> results = new ArrayList<>();
+        List<DetectionResult> results = new ArrayList<DetectionResult>();
         
 
         for (int i = 0; i < visits.size(); i++) {
@@ -69,6 +69,25 @@ public class AgeDetectionService {
         return results;
 
     }
+
+    public List<DetectionResult> findResultByStoreByDate(LocalDateTime startDate, LocalDateTime endDate, Integer id){
+        Store store = findStoreById(id);
+    
+        List<Visit> visits = findVisitsOfStore(store);
+    
+        List<DetectionResult> results = new ArrayList<>();
+    
+        for (Visit visit : visits) {
+            DetectionResult result = resultRepository.findByVisitIdBetweenTimestamp(visit.getVisitId(), startDate, endDate);
+            if (result != null) {
+                results.add(result);
+            }
+        }
+    
+        return results;
+    }
+
+    
 
     public Visit findVisitById(Integer id){
         return visitRepository.getReferenceById(id);
