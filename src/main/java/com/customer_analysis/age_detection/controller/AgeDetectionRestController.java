@@ -167,7 +167,7 @@ public class AgeDetectionRestController {
         return service.getGenderCountByAgeGroup();
     }
 
-    @GetMapping("/monthlyCounts")
+    @GetMapping("/monthly_counts")
     public List<MonthlyCountProjection> getMonthlyCounts(
             @RequestParam("start_date") String startDateString) {
         LocalDateTime startDate = LocalDateTime.parse(startDateString);

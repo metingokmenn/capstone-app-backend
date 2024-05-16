@@ -56,9 +56,10 @@ public interface AgeDetectionResultRepository extends JpaRepository<DetectionRes
     List<AgeGenderCountProjection> getAgeGenderCounts();
 
     @Query("SELECT EXTRACT(MONTH FROM ar.timestamp) AS month, COUNT(*) AS totalCount " +
-           "FROM DetectionResult ar " +
-           "WHERE ar.timestamp >= :startDate " +
-           "GROUP BY EXTRACT(MONTH FROM ar.timestamp)")
+       "FROM DetectionResult ar " +
+       "WHERE ar.timestamp >= :startDate " +
+       "GROUP BY EXTRACT(MONTH FROM ar.timestamp) " +
+       "ORDER BY month")
     List<MonthlyCountProjection> getMonthlyCounts(LocalDateTime startDate);
     
     
