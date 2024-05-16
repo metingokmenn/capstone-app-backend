@@ -18,8 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.customer_analysis.age_detection.dao.AgeDetectionResultRepository;
 import com.customer_analysis.age_detection.dao.AgeDetectionStoreRepositroy;
 import com.customer_analysis.age_detection.dao.AgeDetectionVisitRepository;
+import com.customer_analysis.age_detection.model.AgeGenderCountProjection;
 import com.customer_analysis.age_detection.model.DetectionResult;
-
+import com.customer_analysis.age_detection.model.MonthlyCountProjection;
 import com.customer_analysis.age_detection.model.Store;
 import com.customer_analysis.age_detection.model.Visit;
 
@@ -87,12 +88,19 @@ public class AgeDetectionService {
         return results;
     }
 
+    public List<MonthlyCountProjection> getMonthlyCounts(LocalDateTime startDate){
+        return resultRepository.getMonthlyCounts(startDate);
+    }
+
     
 
     public Visit findVisitById(Integer id){
         return visitRepository.getReferenceById(id);
     }
-   
+    
+    public List<AgeGenderCountProjection> getGenderCountByAgeGroup (){
+        return resultRepository.getAgeGenderCounts();
+    }
 
     public List<DetectionResult> findAllResults(){
         return resultRepository.findAll();

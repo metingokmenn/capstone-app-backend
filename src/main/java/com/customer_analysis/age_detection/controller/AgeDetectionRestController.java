@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.customer_analysis.age_detection.model.AgeGenderCountProjection;
 import com.customer_analysis.age_detection.model.DetectionResult;
+import com.customer_analysis.age_detection.model.MonthlyCountProjection;
 import com.customer_analysis.age_detection.model.Store;
 import com.customer_analysis.age_detection.model.Visit;
 import com.customer_analysis.age_detection.service.AgeDetectionService;
@@ -158,6 +160,18 @@ public class AgeDetectionRestController {
         service.addStore(storeName, location);
 
         return ResponseEntity.ok("Store posted.");
+    }
+
+    @GetMapping("/results/getGenderCountByAgeGroup")
+    public List<AgeGenderCountProjection> getGenderCountByAgeGroup() {
+        return service.getGenderCountByAgeGroup();
+    }
+
+    @GetMapping("/monthlyCounts")
+    public List<MonthlyCountProjection> getMonthlyCounts(
+            @RequestParam("start_date") String startDateString) {
+        LocalDateTime startDate = LocalDateTime.parse(startDateString);
+        return service.getMonthlyCounts(startDate);
     }
 
     @PostMapping("/add_visit")
