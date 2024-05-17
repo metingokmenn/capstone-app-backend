@@ -5,7 +5,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.customer_analysis.age_detection.model.AgeGenderCountProjection;
+import com.customer_analysis.age_detection.model.AgeGroupCountProjection;
 import com.customer_analysis.age_detection.model.DetectionResult;
+import com.customer_analysis.age_detection.model.GenderCountProjection;
 import com.customer_analysis.age_detection.model.MonthlyCountProjection;
 import com.customer_analysis.age_detection.model.Visit;
 import java.time.LocalDateTime;
@@ -32,14 +34,11 @@ public interface AgeDetectionResultRepository extends JpaRepository<DetectionRes
     @Query("SELECT d.gender, COUNT(d.gender) FROM DetectionResult d WHERE d.timestamp BETWEEN :start_date AND :end_date GROUP BY d.gender")
     public List<String> countGenderByDate(@Param("start_date") LocalDateTime startDate, @Param("end_date") LocalDateTime endDate);
 
-    @Query("SELECT ageGroup, COUNT(ageGroup) FROM DetectionResult GROUP BY ageGroup")
+    @Query("SELECT ageGroup, COUNT(ageGroup) FROM DetectionResult GROUP BY ageGroup ORDER BY CAST(SUBSTRING(ageGroup, 1, POSITION('-' IN ageGroup) - 1) AS int)")
     public List<String> countAge();
 
     @Query("SELECT d.ageGroup, COUNT(d.ageGroup) FROM DetectionResult d WHERE d.timestamp BETWEEN :start_date AND :end_date GROUP BY d.ageGroup")
     public List<String> countAgeByDate(@Param("start_date") LocalDateTime startDate, @Param("end_date") LocalDateTime endDate);
-
-
-
 
     public boolean existsByVisitId(Integer visitId);
 
@@ -49,18 +48,37 @@ public interface AgeDetectionResultRepository extends JpaRepository<DetectionRes
     @Query("SELECT d FROM DetectionResult d JOIN d.visit v WHERE v.id = :visitId AND d.timestamp BETWEEN :start_date AND :end_date")
     public DetectionResult findByVisitIdBetweenTimestamp(@Param("visitId") Integer visitId, @Param("start_date") LocalDateTime startDate, @Param("end_date") LocalDateTime endDate);
 
-    @Query("SELECT dr.ageGroup AS ageGroup, dr.gender AS gender, COUNT(*) AS genderCount " +
-           "FROM DetectionResult dr " +
-           "GROUP BY dr.ageGroup, dr.gender " +
-           "ORDER BY dr.ageGroup, dr.gender")
+    @Query("SELECT adr.ageGroup AS ageGroup, adr.gender AS gender, COUNT(adr) AS genderCount " +
+       "FROM DetectionResult adr " +
+       "JOIN adr.visit vd " +
+       "GROUP BY adr.ageGroup, adr.gender " +
+       "ORDER BY CAST(SUBSTRING(adr.ageGroup, 1, POSITION('-' IN adr.ageGroup) - 1) AS int)")
     List<AgeGenderCountProjection> getAgeGenderCounts();
 
     @Query("SELECT EXTRACT(MONTH FROM ar.timestamp) AS month, COUNT(*) AS totalCount " +
        "FROM DetectionResult ar " +
-       "WHERE ar.timestamp >= :startDate " +
+       "WHERE (EXTRACT(YEAR FROM ar.timestamp) = EXTRACT(YEAR FROM CAST(:startDate AS timestamp)) " +
+       "AND EXTRACT(MONTH FROM ar.timestamp) <= EXTRACT(MONTH FROM CAST(:startDate AS timestamp))) " +
        "GROUP BY EXTRACT(MONTH FROM ar.timestamp) " +
        "ORDER BY month")
     List<MonthlyCountProjection> getMonthlyCounts(LocalDateTime startDate);
+
+    @Query("SELECT adr.gender AS gender, COUNT(adr) AS totalCount " +
+           "FROM DetectionResult adr " +
+           "JOIN adr.visit vd " +
+           "WHERE vd.store.id = :storeId " +
+           "GROUP BY adr.gender")
+    List<GenderCountProjection> findGenderCountsByStoreId(@Param("storeId") Integer storeId);
+
+    @Query("SELECT adr.ageGroup AS ageGroup, COUNT(adr) AS totalCount " +
+       "FROM DetectionResult adr " +
+       "JOIN adr.visit vd " +
+       "WHERE vd.store.id = :storeId " +
+       "GROUP BY adr.ageGroup " +
+       "ORDER BY CAST(SUBSTRING(adr.ageGroup, 1, POSITION('-' IN adr.ageGroup) - 1) AS int)")
+    List<AgeGroupCountProjection> findAgeGroupCountsByStoreId(@Param("storeId") int storeId);
+
+
     
     
 }

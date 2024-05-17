@@ -116,7 +116,6 @@ public class AgeDetectionRestController {
     }
 
     @GetMapping("/results/gender")
-    
     public ResponseEntity<Map<String,Integer>> getGenderCount(@RequestParam("start_date") Optional<String> startDateString, @RequestParam("end_date") Optional<String> endDateString){
         Map<String, Integer> genderCountsMap;
         
@@ -135,10 +134,8 @@ public class AgeDetectionRestController {
     }
 
     @GetMapping("/results/age")
-    
     public ResponseEntity<Map<String,Integer>> getAgeCount(@RequestParam("start_date") Optional<String> startDateString, @RequestParam("end_date") Optional<String> endDateString){
         Map<String,Integer> ageCounts;
-
         if(startDateString.isPresent() && endDateString.isPresent()){
             LocalDateTime startDate = LocalDateTime.parse(startDateString.get());
             LocalDateTime endDate = LocalDateTime.parse(endDateString.get());
@@ -148,8 +145,6 @@ public class AgeDetectionRestController {
         else{
             ageCounts = service.getAgeCounts();
         }
-        
-        
 
         return ResponseEntity.ok(ageCounts);
     }
@@ -167,6 +162,16 @@ public class AgeDetectionRestController {
         return service.getGenderCountByAgeGroup();
     }
 
+    @GetMapping("/gender_counts/{storeId}")
+    public Map<String, Long> getGenderCounts(@PathVariable int storeId) {
+        return service.getGenderCountsByStoreId(storeId);
+    }
+
+    @GetMapping("/age_group_counts/{storeId}")
+    public Map<String, Long> getAgeGroupCounts(@PathVariable int storeId) {
+        return service.getAgeGroupCountsByStoreId(storeId);
+    }
+
     @GetMapping("/monthly_counts")
     public List<MonthlyCountProjection> getMonthlyCounts(
             @RequestParam("start_date") String startDateString) {
@@ -182,8 +187,8 @@ public class AgeDetectionRestController {
         return ResponseEntity.ok("Visit posted.");
     }
 
+
     @PostMapping("/add_result")
-    
     public ResponseEntity<String> addResult(@RequestParam("age_group") String ageGroup, @RequestParam("gender") String gender , @RequestParam("confidence_score") Double confidenceScore, @RequestParam("visit_id") Integer id){
 
         service.addResult(gender, ageGroup, confidenceScore, id);

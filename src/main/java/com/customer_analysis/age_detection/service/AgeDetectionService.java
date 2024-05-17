@@ -3,10 +3,11 @@ package com.customer_analysis.age_detection.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
+import java.util.stream.Collectors;
 import java.lang.IllegalStateException;
 
 
@@ -19,7 +20,9 @@ import com.customer_analysis.age_detection.dao.AgeDetectionResultRepository;
 import com.customer_analysis.age_detection.dao.AgeDetectionStoreRepositroy;
 import com.customer_analysis.age_detection.dao.AgeDetectionVisitRepository;
 import com.customer_analysis.age_detection.model.AgeGenderCountProjection;
+import com.customer_analysis.age_detection.model.AgeGroupCountProjection;
 import com.customer_analysis.age_detection.model.DetectionResult;
+import com.customer_analysis.age_detection.model.GenderCountProjection;
 import com.customer_analysis.age_detection.model.MonthlyCountProjection;
 import com.customer_analysis.age_detection.model.Store;
 import com.customer_analysis.age_detection.model.Visit;
@@ -88,6 +91,21 @@ public class AgeDetectionService {
         return results;
     }
 
+    public Map<String, Long> getGenderCountsByStoreId(Integer storeId) {
+        List<GenderCountProjection> results = resultRepository.findGenderCountsByStoreId(storeId);
+        return results.stream()
+                      .collect(Collectors.toMap(GenderCountProjection::getGender, GenderCountProjection::getTotalCount));
+    }
+
+    public LinkedHashMap<String, Long> getAgeGroupCountsByStoreId(int storeId) {
+        List<AgeGroupCountProjection> results = resultRepository.findAgeGroupCountsByStoreId(storeId);
+        LinkedHashMap<String, Long> resultMap = new LinkedHashMap<>();
+        for (AgeGroupCountProjection result : results) {
+            resultMap.put(result.getAgeGroup(), result.getTotalCount());
+        }
+        return resultMap;
+    }
+
     public List<MonthlyCountProjection> getMonthlyCounts(LocalDateTime startDate){
         return resultRepository.getMonthlyCounts(startDate);
     }
@@ -108,7 +126,8 @@ public class AgeDetectionService {
 
     public Map<String,Integer> getAgeCounts(){
         List<String> ageCounts = resultRepository.countAge();
-        Map<String,Integer> ageGroupCounts = new HashMap<String,Integer>();
+        Map<String,Integer> ageGroupCounts = new LinkedHashMap<>();
+
         // Iterate over each data entry
         for (String entry : ageCounts) {
             // Split each entry into age group and count parts
@@ -116,7 +135,7 @@ public class AgeDetectionService {
             String ageGroup = parts[0];
             int count = Integer.parseInt(parts[1]);
 
-            // Add age group and count to the map
+            // Add age group and count to the LinkedHashMap
             ageGroupCounts.put(ageGroup, count);
         }
 
