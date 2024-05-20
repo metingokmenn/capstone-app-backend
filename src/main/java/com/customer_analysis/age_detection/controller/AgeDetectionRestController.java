@@ -158,8 +158,8 @@ public class AgeDetectionRestController {
     }
 
     @GetMapping("/results/getGenderCountByAgeGroup")
-    public List<AgeGenderCountProjection> getGenderCountByAgeGroup() {
-        return service.getGenderCountByAgeGroup();
+    public List<Map<String, Map<String, Long>>> getGenderCountByAgeGroup() {
+        return service.getFormattedAgeGenderCounts();
     }
 
     @GetMapping("/gender_counts/{storeId}")

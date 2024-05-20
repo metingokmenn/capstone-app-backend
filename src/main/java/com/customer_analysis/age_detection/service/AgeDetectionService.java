@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.lang.IllegalStateException;
 
@@ -20,6 +21,7 @@ import com.customer_analysis.age_detection.dao.AgeDetectionResultRepository;
 import com.customer_analysis.age_detection.dao.AgeDetectionStoreRepositroy;
 import com.customer_analysis.age_detection.dao.AgeDetectionVisitRepository;
 import com.customer_analysis.age_detection.model.AgeGenderCountProjection;
+import com.customer_analysis.age_detection.model.AgeGroup;
 import com.customer_analysis.age_detection.model.AgeGroupCountProjection;
 import com.customer_analysis.age_detection.model.DetectionResult;
 import com.customer_analysis.age_detection.model.GenderCountProjection;
@@ -118,6 +120,38 @@ public class AgeDetectionService {
     
     public List<AgeGenderCountProjection> getGenderCountByAgeGroup (){
         return resultRepository.getAgeGenderCounts();
+    }
+
+    public List<Map<String, Map<String, Long>>> getFormattedAgeGenderCounts() {
+        List<AgeGenderCountProjection> rawData = resultRepository.getAgeGenderCounts();
+        
+        // Anahtarları doğal bir sıraya göre sıralamak için TreeMap kullanıyoruz
+        TreeMap<AgeGroup, Map<String, Long>> formattedData = new TreeMap<>();
+        
+        for (AgeGenderCountProjection record : rawData) {
+            String ageGroup = record.getAgeGroup();
+            String gender = record.getGender();
+            Long count = record.getGenderCount();
+            
+            // Yaş grubunu oluşturuyoruz
+            AgeGroup ageGroupObject = new AgeGroup(ageGroup);
+            
+            // Anahtar varsa, anahtarın değerini alıyoruz; yoksa yeni bir map oluşturuyoruz
+            Map<String, Long> genderCounts = formattedData.computeIfAbsent(ageGroupObject, k -> new HashMap<>());
+            
+            // Cinsiyet ve sayıyı ekliyoruz
+            genderCounts.put(gender, count);
+        }
+        
+        // TreeMap'in içeriğini List<Map> türüne dönüştürmek için bir list oluşturun
+        List<Map<String, Map<String, Long>>> resultList = new ArrayList<>();
+        for (Map.Entry<AgeGroup, Map<String, Long>> entry : formattedData.entrySet()) {
+            Map<String, Map<String, Long>> resultEntry = new HashMap<>();
+            resultEntry.put(entry.getKey().getAgeGroup(), entry.getValue());
+            resultList.add(resultEntry);
+        }
+        
+        return resultList;
     }
 
     public List<DetectionResult> findAllResults(){
