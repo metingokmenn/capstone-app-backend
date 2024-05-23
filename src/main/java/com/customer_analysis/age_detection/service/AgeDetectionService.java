@@ -1,5 +1,6 @@
 package com.customer_analysis.age_detection.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,6 +62,10 @@ public class AgeDetectionService {
         return visitRepository.findByStore(store);
     }
 
+    public String findStoreName(Integer storeId){
+        return storeRepositroy.findStoreName(storeId);
+    }
+
     public List<DetectionResult> findResultByStore(Integer id){
         Store store = findStoreById(id);
 
@@ -110,6 +115,13 @@ public class AgeDetectionService {
 
     public List<MonthlyCountProjection> getMonthlyCounts(LocalDateTime startDate){
         return resultRepository.getMonthlyCounts(startDate);
+    }
+
+    
+
+    public List<Double> getConfidenceScoresForToday() {
+        LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
+        return resultRepository.findAllConfidenceScoresForToday(startOfToday);
     }
 
     

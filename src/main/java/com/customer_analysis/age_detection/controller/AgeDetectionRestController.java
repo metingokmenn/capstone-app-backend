@@ -39,10 +39,20 @@ public class AgeDetectionRestController {
 
     @GetMapping("/stores")
     public ResponseEntity<List<Store>> getStores() {
+        
         List<Store> stores = service.findAllStores();
-
         return ResponseEntity.ok(stores);
+          
     }
+
+    @GetMapping("/stores/{id}")
+    public ResponseEntity<String> getStoreById(@PathVariable("id") Integer storeId){
+
+        String storeName = service.findStoreName(storeId);
+        return ResponseEntity.ok(storeName);
+    }
+
+    
 
     @GetMapping("/visits")
     public ResponseEntity<List<Visit>> getVisits(){
@@ -142,6 +152,11 @@ public class AgeDetectionRestController {
 
 
         return ResponseEntity.ok(genderCountsMap);
+    }
+
+    @GetMapping("/confidenceScores")
+    public List<Double> getConfidenceScoresForToday() {
+        return service.getConfidenceScoresForToday();
     }
 
     @GetMapping("/results/age")

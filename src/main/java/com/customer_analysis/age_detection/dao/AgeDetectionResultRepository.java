@@ -79,6 +79,10 @@ public interface AgeDetectionResultRepository extends JpaRepository<DetectionRes
     List<AgeGroupCountProjection> findAgeGroupCountsByStoreId(@Param("storeId") int storeId);
 
 
+    @Query("SELECT dr.confidenceScore FROM DetectionResult dr WHERE dr.timestamp >= :startOfToday")
+    List<Double> findAllConfidenceScoresForToday(@Param("startOfToday") LocalDateTime startOfToday);
+
+
     
     
 }
