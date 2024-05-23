@@ -11,4 +11,5 @@ public interface AgeDetectionStoreRepositroy extends JpaRepository<Store,Integer
     public List<Store> findByLocation(String Location);
 
     public List<Store> findByStoreName(String storeName);
+
 }

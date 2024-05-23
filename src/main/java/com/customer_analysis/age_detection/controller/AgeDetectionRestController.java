@@ -97,6 +97,17 @@ public class AgeDetectionRestController {
 
     }
 
+
+    @GetMapping("/checkStoreId")
+    public ResponseEntity<Boolean> checkStoreId(@RequestParam("store_id") Integer id) {
+
+        boolean result = service.isStorExistById(id);
+
+        return ResponseEntity.ok(result);
+    }
+
+
+
     @GetMapping("/results")
     public ResponseEntity<List<DetectionResult>> getResults(@RequestParam("start_date") Optional<String> startDateString,
     @RequestParam("end_date") Optional<String> endDateString){

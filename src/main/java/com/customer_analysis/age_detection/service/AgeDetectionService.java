@@ -349,4 +349,8 @@ public class AgeDetectionService {
         return resultList;
         
     }
+
+    public boolean isStorExistById(Integer storeId){
+        return storeRepositroy.existsById(storeId);
+    }
 }
