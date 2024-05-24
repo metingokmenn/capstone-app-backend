@@ -3,6 +3,7 @@ package com.customer_analysis.age_detection.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,6 +17,8 @@ import java.lang.IllegalStateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalTime;
 
 
 import com.customer_analysis.age_detection.dao.AgeDetectionResultRepository;
@@ -81,6 +84,17 @@ public class AgeDetectionService {
 
     }
 
+    public List<Double> getConfidenceScoresByStoreIdAndToday(Integer storeId) {
+        
+        LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
+
+        return resultRepository.findConfidenceScoresByStoreIdAndToday(storeId, startOfToday);
+    }
+
+    public List<MonthlyCountProjection> getMonthlyCountsByStoreId(LocalDateTime startDate, Integer storeId) {
+        return resultRepository.getMonthlyCountsByStoreId(startDate, storeId);
+    }
+
     public List<DetectionResult> findResultByStoreByDate(LocalDateTime startDate, LocalDateTime endDate, Integer id){
         Store store = findStoreById(id);
     
@@ -136,6 +150,102 @@ public class AgeDetectionService {
 
     public List<Map<String, Map<String, Long>>> getFormattedAgeGenderCounts() {
         List<AgeGenderCountProjection> rawData = resultRepository.getAgeGenderCounts();
+        
+        // Anahtarları doğal bir sıraya göre sıralamak için TreeMap kullanıyoruz
+        TreeMap<AgeGroup, Map<String, Long>> formattedData = new TreeMap<>();
+        
+        for (AgeGenderCountProjection record : rawData) {
+            String ageGroup = record.getAgeGroup();
+            String gender = record.getGender();
+            Long count = record.getGenderCount();
+            
+            // Yaş grubunu oluşturuyoruz
+            AgeGroup ageGroupObject = new AgeGroup(ageGroup);
+            
+            // Anahtar varsa, anahtarın değerini alıyoruz; yoksa yeni bir map oluşturuyoruz
+            Map<String, Long> genderCounts = formattedData.computeIfAbsent(ageGroupObject, k -> new HashMap<>());
+            
+            // Cinsiyet ve sayıyı ekliyoruz
+            genderCounts.put(gender, count);
+        }
+        
+        // TreeMap'in içeriğini List<Map> türüne dönüştürmek için bir list oluşturun
+        List<Map<String, Map<String, Long>>> resultList = new ArrayList<>();
+        for (Map.Entry<AgeGroup, Map<String, Long>> entry : formattedData.entrySet()) {
+            Map<String, Map<String, Long>> resultEntry = new HashMap<>();
+            resultEntry.put(entry.getKey().getAgeGroup(), entry.getValue());
+            resultList.add(resultEntry);
+        }
+        
+        return resultList;
+    }
+
+    public List<Map<String, Map<String, Long>>> getFormattedAgeGenderCountsByStoreId(Integer storeId) {
+        List<AgeGenderCountProjection> rawData = resultRepository.getAgeGenderCountsByStoreId(storeId);
+        
+        // Anahtarları doğal bir sıraya göre sıralamak için TreeMap kullanıyoruz
+        TreeMap<AgeGroup, Map<String, Long>> formattedData = new TreeMap<>();
+        
+        for (AgeGenderCountProjection record : rawData) {
+            String ageGroup = record.getAgeGroup();
+            String gender = record.getGender();
+            Long count = record.getGenderCount();
+            
+            // Yaş grubunu oluşturuyoruz
+            AgeGroup ageGroupObject = new AgeGroup(ageGroup);
+            
+            // Anahtar varsa, anahtarın değerini alıyoruz; yoksa yeni bir map oluşturuyoruz
+            Map<String, Long> genderCounts = formattedData.computeIfAbsent(ageGroupObject, k -> new HashMap<>());
+            
+            // Cinsiyet ve sayıyı ekliyoruz
+            genderCounts.put(gender, count);
+        }
+        
+        // TreeMap'in içeriğini List<Map> türüne dönüştürmek için bir list oluşturun
+        List<Map<String, Map<String, Long>>> resultList = new ArrayList<>();
+        for (Map.Entry<AgeGroup, Map<String, Long>> entry : formattedData.entrySet()) {
+            Map<String, Map<String, Long>> resultEntry = new HashMap<>();
+            resultEntry.put(entry.getKey().getAgeGroup(), entry.getValue());
+            resultList.add(resultEntry);
+        }
+        
+        return resultList;
+    }
+
+    public List<Map<String, Map<String, Long>>> getFormattedAgeGenderCountsByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        List<AgeGenderCountProjection> rawData = resultRepository.getAgeGenderCountsByDateRange(startDate,endDate);
+        
+        // Anahtarları doğal bir sıraya göre sıralamak için TreeMap kullanıyoruz
+        TreeMap<AgeGroup, Map<String, Long>> formattedData = new TreeMap<>();
+        
+        for (AgeGenderCountProjection record : rawData) {
+            String ageGroup = record.getAgeGroup();
+            String gender = record.getGender();
+            Long count = record.getGenderCount();
+            
+            // Yaş grubunu oluşturuyoruz
+            AgeGroup ageGroupObject = new AgeGroup(ageGroup);
+            
+            // Anahtar varsa, anahtarın değerini alıyoruz; yoksa yeni bir map oluşturuyoruz
+            Map<String, Long> genderCounts = formattedData.computeIfAbsent(ageGroupObject, k -> new HashMap<>());
+            
+            // Cinsiyet ve sayıyı ekliyoruz
+            genderCounts.put(gender, count);
+        }
+        
+        // TreeMap'in içeriğini List<Map> türüne dönüştürmek için bir list oluşturun
+        List<Map<String, Map<String, Long>>> resultList = new ArrayList<>();
+        for (Map.Entry<AgeGroup, Map<String, Long>> entry : formattedData.entrySet()) {
+            Map<String, Map<String, Long>> resultEntry = new HashMap<>();
+            resultEntry.put(entry.getKey().getAgeGroup(), entry.getValue());
+            resultList.add(resultEntry);
+        }
+        
+        return resultList;
+    }
+
+    public List<Map<String, Map<String, Long>>> getFormattedAgeGenderCountsByStoreIdAndDateRange(Integer storeId, LocalDateTime startDate, LocalDateTime endDate) {
+        List<AgeGenderCountProjection> rawData = resultRepository.getAgeGenderCountsByStoreIdAndDateRange(storeId,startDate,endDate);
         
         // Anahtarları doğal bir sıraya göre sıralamak için TreeMap kullanıyoruz
         TreeMap<AgeGroup, Map<String, Long>> formattedData = new TreeMap<>();
@@ -242,6 +352,28 @@ public class AgeDetectionService {
         }
 
         return genderCountsMap;
+    }
+
+    public Map<String, Long> findGenderCountsByStoreIdAndDateRange(int storeId, LocalDateTime startDate, LocalDateTime endDate) {
+        List<GenderCountProjection> results = resultRepository.findGenderCountsByStoreIdAndDateRange(storeId, startDate, endDate);
+        Map<String, Long> genderCountMap = new HashMap<>();
+        
+        for (GenderCountProjection result : results) {
+            genderCountMap.put(result.getGender(), result.getTotalCount());
+        }
+        
+        return genderCountMap;
+    }
+
+    public Map<String, Long> findAgeGroupCountsByStoreIdAndDateRange(int storeId, LocalDateTime startDate, LocalDateTime endDate) {
+        List<AgeGroupCountProjection> results = resultRepository.findAgeGroupCountsByStoreIdAndDateRange(storeId, startDate, endDate);
+        Map<String, Long> ageGroupCountMap = new LinkedHashMap<>(); // LinkedHashMap kullanarak sıralamayı koru
+    
+        for (AgeGroupCountProjection result : results) {
+            ageGroupCountMap.put(result.getAgeGroup(), result.getTotalCount());
+        }
+    
+        return ageGroupCountMap;
     }
 
     public List<DetectionResult> findResultByDate(LocalDateTime startDate, LocalDateTime endDate){

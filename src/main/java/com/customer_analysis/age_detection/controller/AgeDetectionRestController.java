@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.customer_analysis.age_detection.model.AgeGenderCountProjection;
+import com.customer_analysis.age_detection.model.AgeGroupCountProjection;
 import com.customer_analysis.age_detection.model.DetectionResult;
+import com.customer_analysis.age_detection.model.GenderCountProjection;
 import com.customer_analysis.age_detection.model.MonthlyCountProjection;
 import com.customer_analysis.age_detection.model.Store;
 import com.customer_analysis.age_detection.model.Visit;
@@ -86,6 +88,19 @@ public class AgeDetectionRestController {
 
     }
 
+    @GetMapping("/confidenceScoresByStore")
+    public List<Double> getConfidenceScoresByStoreIdAndToday(@RequestParam("store_id") Integer storeId) {
+        return service.getConfidenceScoresByStoreIdAndToday(storeId);
+    }
+
+    @GetMapping("/monthlyCountsByStore")
+    public List<MonthlyCountProjection> getMonthlyCountsByStoreId(@RequestParam("start_date") LocalDateTime startDate,
+                                                                  @RequestParam("store_id") Integer storeId) {
+        return service.getMonthlyCountsByStoreId(startDate, storeId);
+    }
+
+
+
     @GetMapping("/findResultByStore/{id}")
     public ResponseEntity<List<DetectionResult>> getResultByStore(@PathVariable Integer id, @RequestParam("start_date") Optional<String> startDateString, @RequestParam("end_date") Optional<String> endDateString){
 
@@ -154,6 +169,20 @@ public class AgeDetectionRestController {
         return ResponseEntity.ok(genderCountsMap);
     }
 
+    @GetMapping("/gender-counts")
+    public Map<String,Long> findGenderCountsByStoreIdAndDateRange(@RequestParam("store_id") Integer storeId,
+                                                                             @RequestParam("start_date") LocalDateTime startDate,
+                                                                             @RequestParam("end_date") LocalDateTime endDate) {
+        return service.findGenderCountsByStoreIdAndDateRange(storeId, startDate, endDate);
+    }
+
+    @GetMapping("/age-group-counts")
+    public Map<String,Long> findAgeGroupCountsByStoreIdAndDateRange(@RequestParam("store_id") int storeId,
+                                                                                 @RequestParam("start_date") LocalDateTime startDate,
+                                                                                 @RequestParam("end_date") LocalDateTime endDate) {
+        return service.findAgeGroupCountsByStoreIdAndDateRange(storeId, startDate, endDate);
+    }
+
     @GetMapping("/confidenceScores")
     public List<Double> getConfidenceScoresForToday() {
         return service.getConfidenceScoresForToday();
@@ -187,7 +216,22 @@ public class AgeDetectionRestController {
     public List<Map<String, Map<String, Long>>> getGenderCountByAgeGroup() {
         return service.getFormattedAgeGenderCounts();
     }
+    
+    @GetMapping("/results/getGenderCountByAgeGroupByStoreId")
+    public List<Map<String, Map<String, Long>>> getGenderCountByAgeGroupByStoreId(@RequestParam("store_id") Integer storeId) {
+        return service.getFormattedAgeGenderCountsByStoreId(storeId);
+    }
 
+    @GetMapping("/results/getGenderCountByAgeGroupByDateRange")
+    public List<Map<String, Map<String, Long>>> getGenderCountByAgeGroupByDateRange(@RequestParam("start_date") LocalDateTime startDate, @RequestParam("end_date") LocalDateTime endDate) {
+        return service.getFormattedAgeGenderCountsByDateRange(startDate,endDate);
+    }
+
+    @GetMapping("/results/getGenderCountByAgeGroupByStoreIdAndDateRange")
+    public List<Map<String, Map<String, Long>>> getGenderCountByAgeGroupByStoreIdAndDateRange(@RequestParam("store_id") Integer storeId,@RequestParam("start_date") LocalDateTime startDate, @RequestParam("end_date") LocalDateTime endDate ) {
+        return service.getFormattedAgeGenderCountsByStoreIdAndDateRange(storeId,startDate,endDate);
+    }
+    
     @GetMapping("/gender_counts/{storeId}")
     public Map<String, Long> getGenderCounts(@PathVariable int storeId) {
         return service.getGenderCountsByStoreId(storeId);
