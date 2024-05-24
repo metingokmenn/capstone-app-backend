@@ -250,11 +250,11 @@ public class AgeDetectionRestController {
     }
 
     @PostMapping("/add_visit")
-    public ResponseEntity<String> addVisit(@RequestParam("store_id") Integer id){
+    public ResponseEntity<Integer> addVisit(@RequestParam("store_id") Integer id){
         
-        service.addVisit(id);
+        Visit visit = service.addVisit(id);
 
-        return ResponseEntity.ok("Visit posted.");
+        return ResponseEntity.ok(visit.getVisitId());
     }
 
 

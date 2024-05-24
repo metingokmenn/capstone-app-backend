@@ -389,9 +389,12 @@ public class AgeDetectionService {
         storeRepositroy.save(new Store(storeName,location));
     }
 
-    public void addVisit(Integer id){
+    public Visit addVisit(Integer id){
         Store store = findStoreById(id);
-        visitRepository.save(new Visit(store));
+        Visit visit = new Visit(store);
+        visitRepository.save(visit);
+
+        return visit;
     }
 
     
